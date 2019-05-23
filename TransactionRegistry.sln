@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionRegistry.Core", "TransactionRegistry.Core\TransactionRegistry.Core.csproj", "{EE89C475-CE10-45B1-A307-F6009D3D0198}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionRegistry.Tests", "TransactionRegistry.Tests\TransactionRegistry.Tests.csproj", "{1EF8D404-F06A-4C27-92E8-FB308604D890}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE89C475-CE10-45B1-A307-F6009D3D0198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE89C475-CE10-45B1-A307-F6009D3D0198}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE89C475-CE10-45B1-A307-F6009D3D0198}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE89C475-CE10-45B1-A307-F6009D3D0198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EF8D404-F06A-4C27-92E8-FB308604D890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EF8D404-F06A-4C27-92E8-FB308604D890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EF8D404-F06A-4C27-92E8-FB308604D890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EF8D404-F06A-4C27-92E8-FB308604D890}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
