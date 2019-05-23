@@ -81,5 +81,40 @@ namespace TransactionRegistry.Tests
             Assert.Equal(devicesCount, result.Count());
             Assert.Equal(devicesCount, result.Count(e => e.ProcessedTransactionNumber == (ulong)maxValue));
         }
+        
+        [Fact]
+        public void TestSimpleManyThreadsManyDevicesManyGroups()
+        {
+            var registry = new Registry();
+            var maxValue = 1000;
+            var devicesCount = 100;
+            var groupsCount = 10;
+
+            List<Task> tasks = new List<Task>();
+
+            foreach (var group in Enumerable.Range(1, groupsCount))
+            {
+                foreach (var device in Enumerable.Range(1, devicesCount))
+                {
+                    var index = device;
+                    tasks.AddRange(Enumerable
+                        .Range(1, maxValue)
+                        .Select(x =>
+                            Task.Factory.StartNew(() =>
+                                registry.Save("Group_" + group, new ServiceState("device_" + index, (ulong) x)))));
+                }
+            }
+
+            Task.WaitAll(tasks.ToArray());
+
+            foreach (var group in Enumerable.Range(1, groupsCount))
+            {
+                var result = registry.Find("Group_" + group, 0L);
+            
+                Assert.NotNull(result);
+                Assert.Equal(devicesCount, result.Count());
+                Assert.Equal(devicesCount, result.Count(e => e.ProcessedTransactionNumber == (ulong)maxValue));
+            }
+        }
     }
 }
