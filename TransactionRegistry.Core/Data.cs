@@ -3,7 +3,6 @@ using System.Collections.Generic;
 namespace TransactionRegistry.Core
 {
     using System.Collections.Concurrent;
-    using System.Collections.Immutable;
     using TransactionRegistry.Core.Models;
     
     public class Data

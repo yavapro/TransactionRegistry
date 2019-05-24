@@ -32,6 +32,17 @@
                 {
                     savedList = Interlocked.CompareExchange(ref storyService.List, null, null);
                     newList = new SortedSet<ServiceState>(storyService.Key.Values, new ServiceStateComparer());
+                    
+                    ServiceState currentServiceState;
+                    while (!storyService.Key.TryGetValue(serviceState.Id, out currentServiceState))
+                    {
+                    }
+
+                    if (currentServiceState.ProcessedTransactionNumber > serviceState.ProcessedTransactionNumber)
+                    {
+                        break;
+                    }
+                    
                 } while (Interlocked.CompareExchange(ref storyService.List, newList, savedList) != savedList);
             }
         }
