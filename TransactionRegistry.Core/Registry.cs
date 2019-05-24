@@ -11,39 +11,12 @@
     
         public void Save(string serviceType, ServiceState serviceState)
         {
-            var storyService = story.GetOrAdd(
-                serviceType, 
-                new Data
-                {
-                    Key = new ConcurrentDictionary<string, ServiceState>(), 
-                    List = new SortedSet<ServiceState>()
-                });
-            
-            var newTransactionNumber = storyService.Key.AddOrUpdate(
-                serviceState.Id,
-                serviceState,
-                (key, value) => value.ProcessedTransactionNumber > serviceState.ProcessedTransactionNumber ? value : serviceState);
+            var storyService = GetServiceStory(serviceType);
+            var newTransactionNumber = UpdateDeviceTransactionNumber(storyService, serviceState);
 
             if (newTransactionNumber.ProcessedTransactionNumber == serviceState.ProcessedTransactionNumber)
             {
-                SortedSet<ServiceState> savedList, newList;
-                
-                do
-                {
-                    savedList = Interlocked.CompareExchange(ref storyService.List, null, null);
-                    newList = new SortedSet<ServiceState>(storyService.Key.Values, new ServiceStateComparer());
-                    
-                    ServiceState currentServiceState;
-                    while (!storyService.Key.TryGetValue(serviceState.Id, out currentServiceState))
-                    {
-                    }
-
-                    if (currentServiceState.ProcessedTransactionNumber > serviceState.ProcessedTransactionNumber)
-                    {
-                        break;
-                    }
-                    
-                } while (Interlocked.CompareExchange(ref storyService.List, newList, savedList) != savedList);
+                UpdateSearchList(storyService, serviceState);
             }
         }
 
@@ -61,6 +34,48 @@
                 new ServiceState(null, ulong.MaxValue));
 
             return list;
+        }
+
+        private Data GetServiceStory(string serviceType)
+        {
+            return story.GetOrAdd(
+                serviceType, 
+                new Data
+                {
+                    Key = new ConcurrentDictionary<string, ServiceState>(), 
+                    List = new SortedSet<ServiceState>()
+                });
+        }
+
+        private ServiceState UpdateDeviceTransactionNumber(Data serviceStory, ServiceState serviceState)
+        {
+            return serviceStory.Key.AddOrUpdate(
+                serviceState.Id,
+                serviceState,
+                (key, value) => value.ProcessedTransactionNumber > serviceState.ProcessedTransactionNumber ? value : serviceState);
+        }
+
+        private void UpdateSearchList(Data serviceStory, ServiceState serviceState)
+        {
+            SortedSet<ServiceState> savedList, newList;
+            
+            do
+            {
+                savedList = Interlocked.CompareExchange(ref serviceStory.List, null, null);
+                newList = new SortedSet<ServiceState>(serviceStory.Key.Values, new ServiceStateComparer());
+
+                if (IsDeviceTransactionNumberInvalidate(serviceStory, serviceState))
+                {
+                    break;
+                }
+                    
+            } while (Interlocked.CompareExchange(ref serviceStory.List, newList, savedList) != savedList);
+        }
+
+        private bool IsDeviceTransactionNumberInvalidate(Data serviceStory, ServiceState serviceState)
+        {
+            var currentServiceState = serviceStory.Key.GetOrAdd(serviceState.Id, serviceState);
+            return currentServiceState.ProcessedTransactionNumber > serviceState.ProcessedTransactionNumber;
         }
     }
 }
